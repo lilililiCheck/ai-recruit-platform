@@ -21,4 +21,10 @@ export class FavoritesController {
   async remove(@Request() req, @Param('id') id: number) {
     return this.favoritesService.remove(req.user.id, id);
   }
+
+  @Get('check/:jobId')
+  async check(@Request() req, @Param('jobId') jobId: number) {
+    const isFavorite = await this.favoritesService.checkIsFavorite(req.user.id, jobId);
+    return { isFavorite };
+  }
 }
