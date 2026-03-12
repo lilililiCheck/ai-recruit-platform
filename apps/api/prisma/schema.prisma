@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id          Int        @id @default(autoincrement())
+  email       String     @unique
+  password    String
+  name        String     @db.VarChar(100)
+  avatar      String?
+  phone       String?
+  role        String     @default("user")
+  preferences Json?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  favorites      Favorite[]
+  subscriptions  Subscription[]
+}
+
+// Job model
+model Job {
+  id            Int        @id @default(autoincrement())
+  title         String
+  description   String     @db.Text
+  requirements  String?    @db.Text
+  benefits      String?    @db.Text
+  company       String
+  companyLogo   String?
+  location      String?
+  salaryMin     Decimal?   @db.Decimal(10, 2)
+  salaryMax     Decimal?   @db.Decimal(10, 2)
+  salaryText    String?
+  experience    String?
+  education     String?
+  jobType       String?
+  category      String     @default("tech")
+  source        String?
+  sourceUrl     String?
+  isActive      Boolean    @default(true)
+  skills        Json?
+  tags          Json?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  favorites     Favorite[]
+}
+
+// Favorite model
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  jobId     Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+}
+
+// Subscription model
+model Subscription {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  keyword    String?
+  location   String?
+  category   String?
+  frequency  String     @default("daily")
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
